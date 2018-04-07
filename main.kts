@@ -3,14 +3,109 @@
 println("UW Homework: Simple Kotlin")
 
 // write a "whenFn" that takes an arg of type "Any" and returns a String
-
+    fun whenFn(arg: Any): String {
+        when (arg) {
+            "Hello" -> return "world"
+            is String -> return "Say what?"
+            0 -> return "zero"
+            1 -> return "one"
+            in 2..10 -> return "low number"
+            is Int -> return "a number"
+            else -> {
+                return "I don't understand"
+            }
+        }
+    }
 // write an "add" function that takes two Ints, returns an Int, and adds the values
+    fun add (num1: Int, num2: Int) : Int {
+        return num1 + num2
+    }
 // write a "sub" function that takes two Ints, returns an Int, and subtracts the values
+    fun sub (num1: Int, num2: Int) : Int {
+        return num1 - num2
+    }
 // write a "mathOp" function that takes two Ints and a function (that takes two Ints and returns an Int), returns an Int, and applies the passed-in-function to the arguments
+    fun mathOp(num1: Int, num2: Int, function: (a: Int, b: Int)-> Int) :Int {
+        return function(num1, num2)
+    }
 
 // write a class "Person" with first name, last name and age
+    class Person constructor(var firstName: String, var lastName: String, var age: Int){
+        val debugString : String by lazy {
+            "[Person firstName:${firstName} lastName:${lastName} age:${age}]"
+        }
+        fun equals(person1: Person, person2: Person) : Boolean {
+            return person1.hashCode() == person2.hashCode()
+        }
+    }
 
 // write a class "Money"
+    class Money constructor(amount: Int, currency: String)  {
+        var amount = checkAmount(amount)
+        var currency = checkCurrency(currency)
+        val rates = listOf (
+                Pair("USD", 10) to Pair("GBP", 5),
+                Pair("USD", 10) to Pair("EUR", 15),
+                Pair("USD", 12) to Pair("CAN", 15),
+                Pair("GBP", 5) to Pair("USD", 10),
+                Pair("EUR", 15) to Pair("USD", 10),
+                Pair("CAN", 15) to Pair("USD", 12)
+        )
+        fun checkAmount(amountPar: Int):Int {
+            if(amountPar > 0){
+                return amountPar
+            } else {
+                throw Exception("Amount can't be below 0")
+            }
+        }
+        fun checkCurrency (currencyPar: String) :String {
+            when (currencyPar) {
+                "USD" -> return "USD"
+                "EUR" -> return "EUR"
+                "CAN" -> return "CAN"
+                "GBP" -> return "GBP"
+                else -> {
+                    throw Exception("Not right currency")
+                }
+            }
+        }
+        fun convert(currencyType: String): Money {
+            var money = Money(this.amount, this.currency)
+            var storeCurrency = this.currency
+            var storeAmount = this.amount
+            if(this.currency == (currencyType)) {
+                return money
+            } else {
+                // if both converter and current are not usd
+                if(this.currency != "USD" && currencyType != "USD") {
+                    for ((k, v) in rates) {
+                        if (k.first == this.currency) {
+                            //change current to amount of money in usd
+                            this.amount = this.amount * v.second / k.second
+                            this.currency = "USD"
+                        }
+                    }
+                }
+                // current is usd, now convert
+                for((k,v) in rates) {
+                    if(k.first == this.currency && v.first == currencyType) {
+                        money.amount = this.amount * v.second / k.second
+                        money.currency = currencyType
+                    }
+                }
+                this.currency = storeCurrency
+                this.amount = storeAmount
+                return money
+            }
+        }
+
+        operator fun plus(otherMoney: Money): Money {
+            var money = Money(this.amount, this.currency)
+            var addMoney: Money = otherMoney.convert(this.currency)
+            money.amount = this.amount + addMoney.amount
+            return money
+        }
+    }
 
 // ============ DO NOT EDIT BELOW THIS LINE =============
 
